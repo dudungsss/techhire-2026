@@ -8,6 +8,9 @@ services:
     environment:
       - PROJECT_NAME=${PROJECT_NAME}
       - XDEBUG=${XDEBUG:-false}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-}
     volumes:
       - ./src:/var/www/html
     depends_on:

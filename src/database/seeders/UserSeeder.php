@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,16 +13,50 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::firstOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@admin.com'],
-            ['name' => 'Super Admin', 'password' => Hash::make('password')]
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password'),
+                'is_active' => true,
+            ]
         );
-        $user->assignRole('super_admin');
 
-        $user = User::firstOrCreate(
+        $admin->syncRoles(['super_admin', 'admin']);
+
+        $user = User::updateOrCreate(
             ['email' => 'user@admin.com'],
-            ['name' => 'User Account', 'password' => Hash::make('password')]
+            [
+                'name' => 'User Account',
+                'password' => Hash::make('password'),
+                'is_active' => true,
+            ]
         );
-        $user->assignRole('user');
+
+        $user->syncRoles(['user']);
+
+        $recruiter = User::updateOrCreate(
+            ['email' => 'recruiter@demo.com'],
+            [
+                'name' => 'Recruiter Account',
+                'password' => Hash::make('password'),
+                'recruiter_status' => 'verified',
+                'is_active' => true,
+            ]
+        );
+
+        $recruiter->syncRoles(['recruiter']);
+
+        $pelamar = User::updateOrCreate(
+            ['email' => 'pelamar@demo.com'],
+            [
+                'name' => 'Pelamar Account',
+                'password' => Hash::make('password'),
+                'recruiter_status' => null,
+                'is_active' => true,
+            ]
+        );
+
+        $pelamar->syncRoles(['pelamar']);
     }
 }

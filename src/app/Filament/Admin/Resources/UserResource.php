@@ -92,6 +92,22 @@ class UserResource extends Resource
                     ])
                     ->columns(1),
 
+                Forms\Components\Section::make('Recruiter Verification')
+                    ->schema([
+                        Forms\Components\Select::make('recruiter_status')
+                            ->label('Recruiter Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'verified' => 'Verified',
+                                'rejected' => 'Rejected',
+                            ])
+                            ->nullable(),
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Active')
+                            ->default(true),
+                    ])
+                    ->columns(2),
+
             ]);
     }
 
@@ -101,7 +117,8 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
@@ -116,14 +133,36 @@ class UserResource extends Resource
                     ->badge()
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('recruiter_status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'verified' => 'success',
+                        'rejected' => 'danger',
+                        default => 'warning',
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->date()
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->label('Role'),
+                Tables\Filters\SelectFilter::make('recruiter_status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'verified' => 'Verified',
+                        'rejected' => 'Rejected',
+                    ])
+                    ->label('Recruiter Status'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

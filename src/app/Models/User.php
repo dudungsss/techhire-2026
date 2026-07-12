@@ -14,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory,HasRoles, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +26,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'name',
         'email',
         'password',
+        'recruiter_status',
+        'phone',
+        'summary',
+        'cv_path',
+        'github_url',
+        'linkedin_url',
+        'portfolio_url',
+        'is_active',
     ];
 
     /**
@@ -64,6 +72,68 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+    return $this->is_active
+        && $this->hasAnyRole(['super_admin', 'admin']);
+    }
+
+    public function isAdmin(): bool
+    {
+    return $this->hasAnyRole(['super_admin', 'admin']);
+    }
+
+    public function isRecruiter(): bool
+    {
+        return $this->hasRole('recruiter');
+    }
+
+    public function isRecruiterVerified(): bool
+    {
+        return $this->isRecruiter() && $this->recruiter_status === 'verified';
+    }
+
+    public function isPelamar(): bool
+    {
+        return $this->hasRole('pelamar');
+    }
+
+    public function company()
+    {
+        return $this->hasOne(Company::class);
+    }
+
+    public function bookmarkedJobs()
+    {
+        return $this->belongsToMany(Job::class, 'user_bookmarks')->withTimestamps();
+    }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'user_skill')->withTimestamps();
+    }
+
+    public function jobApplications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
+    public function recruiterInvitations()
+    {
+        return $this->hasMany(\App\Models\InterviewInvitation::class, 'recruiter_id');
+    }
+
+    public function profileCompletenessPercentage(): int
+    {
+        $score = 0;
+
+        if (!empty($this->name)) $score += 10;
+        if (!empty($this->phone)) $score += 10;
+        if (!empty($this->summary)) $score += 20;
+        if (!empty($this->cv_path)) $score += 25;
+        if ($this->skills()->count() > 0) $score += 20;
+        if (!empty($this->github_url)) $score += 5;
+        if (!empty($this->linkedin_url)) $score += 5;
+        if (!empty($this->portfolio_url)) $score += 5;
+
+        return min($score, 100);
     }
 }
