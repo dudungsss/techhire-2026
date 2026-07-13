@@ -93,6 +93,7 @@ class UserResource extends Resource
                     ->columns(1),
 
                 Forms\Components\Section::make('Recruiter Verification')
+                    ->description('Pastikan "Active" diaktifkan dan "Recruiter Status" = Verified agar recruiter bisa login. Recruiter juga harus mengisi Company Profile terlebih dahulu sebelum bisa membuat lowongan.')
                     ->schema([
                         Forms\Components\Select::make('recruiter_status')
                             ->label('Recruiter Status')
@@ -101,10 +102,12 @@ class UserResource extends Resource
                                 'verified' => 'Verified',
                                 'rejected' => 'Rejected',
                             ])
-                            ->nullable(),
+                            ->nullable()
+                            ->helperText('Set ke "Verified" untuk mengizinkan recruiter mengakses fitur.'),
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
-                            ->default(true),
+                            ->default(true)
+                            ->helperText('Nonaktifkan untuk memblokir akses user ke panel.'),
                     ])
                     ->columns(2),
 

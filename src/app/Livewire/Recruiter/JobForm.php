@@ -76,7 +76,8 @@ class JobForm extends Component
         $company = Auth::user()->company;
 
         if (! $company) {
-            session()->flash('error', 'Isi company profile dulu sebelum membuat lowongan.');
+            session()->flash('error', 'Silakan isi company profile terlebih dahulu sebelum membuat lowongan.');
+            $this->redirectRoute('recruiter.company', navigate: true);
             return;
         }
 
@@ -154,6 +155,21 @@ class JobForm extends Component
         }
 
         return $slug;
+    }
+
+    public function addSkill($skillId): void
+    {
+        $skillId = (string) $skillId;
+        if (! in_array($skillId, $this->skill_ids)) {
+            $this->skill_ids[] = $skillId;
+        }
+    }
+
+    public function removeSkill($skillId): void
+    {
+        $this->skill_ids = array_values(
+            array_filter($this->skill_ids, fn ($id) => $id !== (string) $skillId)
+        );
     }
 
     public function render()
