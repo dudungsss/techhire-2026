@@ -7,6 +7,7 @@ services:
     # Teruskan variabel PROJECT_NAME ke dalam kontainer
     environment:
       - PROJECT_NAME=${PROJECT_NAME}
+      - APP_URL=${APP_URL:-}
       - XDEBUG=${XDEBUG:-false}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}

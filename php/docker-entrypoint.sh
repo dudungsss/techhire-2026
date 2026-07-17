@@ -12,6 +12,9 @@ else
 fi
 
 # Step 2: If .env file doesn't exist, create and add necessary environment variables
+# Allow overriding APP_URL via env var, default to PROJECT_NAME.test
+: "${APP_URL:=https://${PROJECT_NAME}.test}"
+
 # Check if the .env file exists
 if [ ! -f /var/www/html/.env ]; then
   echo "📄 Creating .env file with environment variables..."
@@ -20,11 +23,11 @@ if [ ! -f /var/www/html/.env ]; then
   cat <<EOF > /var/www/html/.env
 APP_NAME="${PROJECT_NAME}"
 APP_ENV=local
-APP_KEY=base64:jU6xg8sp9ia37ypFlTVk1CAFx6MmeXRukO1W987uUzI=
+APP_KEY=
 APP_DEBUG=true
 APP_TIMEZONE='Asia/Jakarta'
-APP_URL="https://${PROJECT_NAME}.test"
-ASSET_URL="https://${PROJECT_NAME}.test"
+APP_URL="${APP_URL}"
+ASSET_URL="${APP_URL}"
 DEBUGBAR_ENABLED=false
 ASSET_PREFIX=
 # ASSET_PREFIX=/dev/kit/public example in case deployed inside a folder
@@ -54,7 +57,7 @@ DB_PASSWORD=p455w0rd
 
 SESSION_DRIVER=database
 SESSION_LIFETIME=120
-SESSION_ENCRYPT=true
+SESSION_ENCRYPT=false
 SESSION_PATH=/
 SESSION_DOMAIN=null
 
@@ -101,11 +104,11 @@ else
   cat <<EOF > /var/www/html/.env
 APP_NAME="${PROJECT_NAME}"
 APP_ENV=local
-APP_KEY=base64:jU6xg8sp9ia37ypFlTVk1CAFx6MmeXRukO1W987uUzI=
+APP_KEY=
 APP_DEBUG=true
 APP_TIMEZONE='Asia/Jakarta'
-APP_URL="https://${PROJECT_NAME}.test"
-ASSET_URL="https://${PROJECT_NAME}.test"
+APP_URL="${APP_URL}"
+ASSET_URL="${APP_URL}"
 DEBUGBAR_ENABLED=false
 ASSET_PREFIX=
 # ASSET_PREFIX=/dev/kit/public example in case deployed inside a folder
@@ -135,7 +138,7 @@ DB_PASSWORD=p455w0rd
 
 SESSION_DRIVER=database
 SESSION_LIFETIME=120
-SESSION_ENCRYPT=true
+SESSION_ENCRYPT=false
 SESSION_PATH=/
 SESSION_DOMAIN=null
 
@@ -206,11 +209,9 @@ if [ ! -d /var/www/html/vendor ]; then
   composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
-# Step 5: Generate app key if not already present
-if [ ! -f /var/www/html/storage/oauth-private.key ]; then
-  echo "🔐 Generating Laravel app key..."
-  php artisan key:generate --force
-fi
+# Step 5: Generate app key (APP_KEY dikosongin di .env biar di-generate tiap start)
+echo "🔐 Generating Laravel app key..."
+php artisan key:generate --force
 
 # Step 6: Create necessary folders and set permissions
 echo "🔧 Fixing permissions..."
@@ -224,7 +225,11 @@ php artisan migrate --force
 
 # Step 8: Run custom project init command
 echo "🚀 Running project:init..."
-php artisan project:init || true
+php artisan project:init
+
+# Step 8b: Optimize Filament assets
+echo "🎨 Optimizing Filament assets..."
+php artisan filament:optimize || true
 
 # Step 9: Create storage symbolic link
 echo "🔗 Creating storage link..."
