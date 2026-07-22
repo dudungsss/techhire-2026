@@ -1,3 +1,6 @@
+# Nama = Yuliadhy Nugraha
+# NIM  = 20240801031
+
 # 🚀 TechHire-2026
 
 **TechHire-2026** adalah platform rekrutmen Teknologi Informasi (IT) berbasis keterampilan (*skill-based recruitment*) yang menghubungkan pelamar dengan perusahaan melalui algoritma pencocokan kompetensi teknis (*Skill Match Score*). Sistem ini membantu pelamar menemukan lowongan yang paling relevan dan membantu recruiter melakukan penyaringan kandidat secara lebih cepat dan terukur.
